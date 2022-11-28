@@ -1,44 +1,14 @@
-import os
-import re
-import string
+import requests
+import wikipedia
 
-def get_words(file_name):
-    with open(file_name, 'r') as f:
-        text = f.read()
-    text = text.lower()
-    for ch in string.punctuation:
-        text = text.replace(ch, ' ')
-    return text.split()
+url = "https://raw.githubusercontent.com/jeremy-rifkin/Wordlist/master/master.txt"
 
-def count_words(words):
-    d = {}
-    for word in words:
-        if word in d:
-            d[word] += 1
-        else:
-            d[word] = 1
-    return d
+response = requests.get(url)
 
-def sort_words(d):
-    l = [(value, key) for key, value in d.items()]
-    l.sort()
-    return l
+words = response.text.split("\n")
 
-def get_all_words(file_name):
-    with open(file_name, 'r') as f:
-        text = f.read()
-    text = text.lower()
-    for ch in string.punctuation:
-        text = text.replace(ch, ' ')
-    return text.split()
+words = [word for word in words if len(word) > 3]
 
-def sort_all_words(words):
-    d = {}
-    for word in words:
-        if word in d:
-            d[word] += 1
-        else:
-            d[word] = 1
-    l = [(value, key) for key, value in d.items()]
-    l.sort()
-    return l
+words = words[:1000]
+
+words.sort(key=lambda word: wikipedia.search(word)[0].lower() == word.lower())
